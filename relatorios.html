@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Relatórios & Analíticos - RSVP Eventos</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body id="reports-page">
+
+  <div class="app-layout">
+    <!-- Menu Lateral -->
+    <aside class="app-sidebar" id="app-sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand-icon">
+          <i class="fas fa-calendar-check"></i>
+        </div>
+        <span class="sidebar-brand-text">RSVP SaaS</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-item">
+          <i class="fas fa-chart-pie"></i> Dashboard
+        </a>
+        <a href="eventos.html" class="nav-item">
+          <i class="fas fa-calendar-alt"></i> Gerenciar Eventos
+        </a>
+        <a href="confirmacoes.html" class="nav-item">
+          <i class="fas fa-check-double"></i> Confirmações
+        </a>
+        <a href="convidados-lista.html" class="nav-item">
+          <i class="fas fa-users"></i> Lista de Convidados
+        </a>
+        <a href="relatorios.html" class="nav-item active">
+          <i class="fas fa-file-invoice"></i> Relatórios
+        </a>
+        <a href="configuracoes.html" class="nav-item">
+          <i class="fas fa-cog"></i> Configurações
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-profile-widget">
+          <div class="user-avatar">A</div>
+          <div class="user-info">
+            <span class="user-name">Administrador</span>
+            <span class="user-role">admin@evento.com</span>
+          </div>
+          <button class="btn-icon btn-logout" title="Sair do Sistema">
+            <i class="fas fa-sign-out-alt"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Conteúdo Principal -->
+    <div class="app-main">
+      <header class="app-topbar">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <button class="mobile-nav-toggle" onclick="document.getElementById('app-sidebar').classList.toggle('open')">
+            <i class="fas fa-bars"></i>
+          </button>
+          <h1 class="page-title-heading">Relatórios Analíticos</h1>
+        </div>
+
+        <div class="topbar-actions">
+          <button class="theme-toggle-btn" onclick="toggleTheme()" title="Alternar Tema Claro/Escuro">
+            <i class="fas fa-moon"></i>
+          </button>
+          <button class="btn btn-outline" onclick="printReport()">
+            <i class="fas fa-print"></i> Imprimir Relatório
+          </button>
+        </div>
+      </header>
+
+      <main class="app-content">
+        <!-- Filtro por Evento -->
+        <div class="card" style="margin-bottom: 1.5rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+            <div>
+              <h3 style="font-size: 1.125rem;">Selecione o Evento</h3>
+              <p class="text-muted" style="font-size: 0.875rem;">Filtre estatísticas detalhadas de confirmações por evento.</p>
+            </div>
+            <select id="report-event-select" class="form-control" style="max-width: 320px;">
+              <option value="all">Visão Geral de Todos os Eventos</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Grid Metrico do Relatorio -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-info">
+              <span class="stat-value" id="report-total-responses">0</span>
+              <span class="stat-label">Total de Respostas</span>
+            </div>
+            <div class="stat-icon-wrapper stat-icon-info"><i class="fas fa-inbox"></i></div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-info">
+              <span class="stat-value text-success" id="report-confirmed-count">0</span>
+              <span class="stat-label">Convites Confirmados</span>
+            </div>
+            <div class="stat-icon-wrapper stat-icon-success"><i class="fas fa-check-circle"></i></div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-info">
+              <span class="stat-value text-danger" id="report-declined-count">0</span>
+              <span class="stat-label">Convites Recusados</span>
+            </div>
+            <div class="stat-icon-wrapper stat-icon-danger"><i class="fas fa-times-circle"></i></div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-info">
+              <span class="stat-value" id="report-total-people">0</span>
+              <span class="stat-label">Total de Pessoas Presentes</span>
+            </div>
+            <div class="stat-icon-wrapper stat-icon-primary"><i class="fas fa-users"></i></div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-info">
+              <span class="stat-value" id="report-adults-count">0</span>
+              <span class="stat-label">Total de Adultos</span>
+            </div>
+            <div class="stat-icon-wrapper stat-icon-warning"><i class="fas fa-user"></i></div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-info">
+              <span class="stat-value" id="report-kids-count">0</span>
+              <span class="stat-label">Total de Crianças</span>
+            </div>
+            <div class="stat-icon-wrapper stat-icon-info"><i class="fas fa-child"></i></div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-info">
+              <span class="stat-value text-success" id="report-conversion-rate">0%</span>
+              <span class="stat-label">Taxa de Confirmação</span>
+            </div>
+            <div class="stat-icon-wrapper stat-icon-success"><i class="fas fa-percentage"></i></div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-info">
+              <span class="stat-value text-danger" id="report-decline-rate">0%</span>
+              <span class="stat-label">Taxa de Recusas</span>
+            </div>
+            <div class="stat-icon-wrapper stat-icon-danger"><i class="fas fa-chart-bar"></i></div>
+          </div>
+        </div>
+
+        <!-- Tabela do Relatório -->
+        <div class="table-container">
+          <div class="table-toolbar">
+            <h3>Desempenho por Evento</h3>
+          </div>
+          <table class="data-table responsive-cards-table">
+            <thead>
+              <tr>
+                <th>Evento</th>
+                <th>Data</th>
+                <th>Respostas</th>
+                <th>Confirmados</th>
+                <th>Recusados</th>
+                <th>Total Pessoas</th>
+                <th>Taxa de Sucesso (%)</th>
+              </tr>
+            </thead>
+            <tbody id="report-events-table-body">
+              <!-- Renderizado via reports.js -->
+            </tbody>
+          </table>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Supabase CDN & JS Modules -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/reports.js"></script>
+</body>
+</html>

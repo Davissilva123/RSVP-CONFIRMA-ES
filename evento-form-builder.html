@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Construtor de Formulário - RSVP Eventos</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body id="form-builder-page">
+
+  <div class="app-layout">
+    <!-- Menu Lateral -->
+    <aside class="app-sidebar" id="app-sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand-icon">
+          <i class="fas fa-calendar-check"></i>
+        </div>
+        <span class="sidebar-brand-text">RSVP SaaS</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-item">
+          <i class="fas fa-chart-pie"></i> Dashboard
+        </a>
+        <a href="eventos.html" class="nav-item active">
+          <i class="fas fa-calendar-alt"></i> Gerenciar Eventos
+        </a>
+        <a href="confirmacoes.html" class="nav-item">
+          <i class="fas fa-check-double"></i> Confirmações
+        </a>
+        <a href="convidados-lista.html" class="nav-item">
+          <i class="fas fa-users"></i> Lista de Convidados
+        </a>
+        <a href="relatorios.html" class="nav-item">
+          <i class="fas fa-file-invoice"></i> Relatórios
+        </a>
+        <a href="configuracoes.html" class="nav-item">
+          <i class="fas fa-cog"></i> Configurações
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-profile-widget">
+          <div class="user-avatar">A</div>
+          <div class="user-info">
+            <span class="user-name">Administrador</span>
+            <span class="user-role">admin@evento.com</span>
+          </div>
+          <button class="btn-icon btn-logout" title="Sair do Sistema">
+            <i class="fas fa-sign-out-alt"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Conteúdo Principal -->
+    <div class="app-main">
+      <header class="app-topbar">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <button class="mobile-nav-toggle" onclick="document.getElementById('app-sidebar').classList.toggle('open')">
+            <i class="fas fa-bars"></i>
+          </button>
+          <div>
+            <h1 class="page-title-heading">Construtor de Formulário</h1>
+            <span class="text-muted" style="font-size: 0.8125rem;">Evento: <strong id="builder-event-title">Carregando...</strong></span>
+          </div>
+        </div>
+
+        <div class="topbar-actions">
+          <button class="theme-toggle-btn" onclick="toggleTheme()" title="Alternar Tema Claro/Escuro">
+            <i class="fas fa-moon"></i>
+          </button>
+          <button class="btn btn-outline" onclick="openFormPreviewModal()">
+            <i class="fas fa-eye"></i> Visualizar Formulário
+          </button>
+          <button class="btn btn-primary" id="save-fields-btn" onclick="saveFormFields()">
+            <i class="fas fa-save"></i> Salvar Formulário
+          </button>
+        </div>
+      </header>
+
+      <main class="app-content">
+        <div class="form-builder-layout">
+          <!-- Painel Esquerdo: Paleta de Tipos de Campos -->
+          <div class="field-type-palette">
+            <h4 style="margin-bottom: 0.5rem; font-size: 0.9375rem;">Adicionar Pergunta</h4>
+            <p class="text-muted" style="font-size: 0.75rem; margin-bottom: 0.75rem;">Clique no tipo de campo abaixo para incluir no formulário:</p>
+
+            <div class="palette-item" onclick="addFieldOfType('text')">
+              <i class="fas fa-font text-primary"></i> Texto Simples
+            </div>
+            <div class="palette-item" onclick="addFieldOfType('textarea')">
+              <i class="fas fa-align-left text-primary"></i> Texto Longo / Comentário
+            </div>
+            <div class="palette-item" onclick="addFieldOfType('select')">
+              <i class="fas fa-list text-primary"></i> Lista Suspensa (Select)
+            </div>
+            <div class="palette-item" onclick="addFieldOfType('radio')">
+              <i class="far fa-dot-circle text-primary"></i> Múltipla Escolha (Radio)
+            </div>
+            <div class="palette-item" onclick="addFieldOfType('checkbox')">
+              <i class="far fa-check-square text-primary"></i> Caixa de Seleção (Checkbox)
+            </div>
+            <div class="palette-item" onclick="addFieldOfType('number')">
+              <i class="fas fa-hashtag text-primary"></i> Número
+            </div>
+            <div class="palette-item" onclick="addFieldOfType('phone')">
+              <i class="fas fa-phone text-primary"></i> Telefone
+            </div>
+            <div class="palette-item" onclick="addFieldOfType('email')">
+              <i class="fas fa-envelope text-primary"></i> E-mail
+            </div>
+            <div class="palette-item" onclick="addFieldOfType('date')">
+              <i class="fas fa-calendar-alt text-primary"></i> Data
+            </div>
+            <div class="palette-item" onclick="addFieldOfType('time')">
+              <i class="fas fa-clock text-primary"></i> Horário
+            </div>
+          </div>
+
+          <!-- Painel Direito: Editor de Campos -->
+          <div class="field-editor-list" id="fields-editor-list">
+            <!-- Renderizado via form-builder.js -->
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Modal de Pré-visualização do Formulário -->
+  <div class="modal-overlay" id="preview-modal">
+    <div class="modal-card" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3>Pré-visualização do Formulário para o Convidado</h3>
+        <button class="btn-icon" onclick="closeModal('preview-modal')">&times;</button>
+      </div>
+      <div class="modal-body" id="form-preview-content">
+        <!-- Renderizado via form-builder.js -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('preview-modal')">Fechar Pré-visualização</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Supabase CDN & JS Modules -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/form-builder.js"></script>
+</body>
+</html>

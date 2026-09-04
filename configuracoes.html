@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configurações - RSVP Eventos</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body id="settings-page">
+
+  <div class="app-layout">
+    <!-- Menu Lateral -->
+    <aside class="app-sidebar" id="app-sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand-icon">
+          <i class="fas fa-calendar-check"></i>
+        </div>
+        <span class="sidebar-brand-text">RSVP SaaS</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-item">
+          <i class="fas fa-chart-pie"></i> Dashboard
+        </a>
+        <a href="eventos.html" class="nav-item">
+          <i class="fas fa-calendar-alt"></i> Gerenciar Eventos
+        </a>
+        <a href="confirmacoes.html" class="nav-item">
+          <i class="fas fa-check-double"></i> Confirmações
+        </a>
+        <a href="convidados-lista.html" class="nav-item">
+          <i class="fas fa-users"></i> Lista de Convidados
+        </a>
+        <a href="relatorios.html" class="nav-item">
+          <i class="fas fa-file-invoice"></i> Relatórios
+        </a>
+        <a href="configuracoes.html" class="nav-item active">
+          <i class="fas fa-cog"></i> Configurações
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-profile-widget">
+          <div class="user-avatar">A</div>
+          <div class="user-info">
+            <span class="user-name">Administrador</span>
+            <span class="user-role">admin@evento.com</span>
+          </div>
+          <button class="btn-icon btn-logout" title="Sair do Sistema">
+            <i class="fas fa-sign-out-alt"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Conteúdo Principal -->
+    <div class="app-main">
+      <header class="app-topbar">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <button class="mobile-nav-toggle" onclick="document.getElementById('app-sidebar').classList.toggle('open')">
+            <i class="fas fa-bars"></i>
+          </button>
+          <h1 class="page-title-heading">Configurações do Perfil & Sistema</h1>
+        </div>
+
+        <div class="topbar-actions">
+          <button class="theme-toggle-btn" onclick="toggleTheme()" title="Alternar Tema Claro/Escuro">
+            <i class="fas fa-moon"></i>
+          </button>
+        </div>
+      </header>
+
+      <main class="app-content">
+        <div style="max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.5rem;">
+
+          <!-- Card de Dados do Perfil -->
+          <div class="card">
+            <h3 style="margin-bottom: 1rem;"><i class="fas fa-user-edit text-primary"></i> Dados do Perfil</h3>
+
+            <form id="profile-settings-form">
+              <div class="form-group">
+                <label class="form-label" for="setting-name">Nome Completo</label>
+                <input type="text" id="setting-name" class="form-control" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="setting-email">E-mail Cadastrado</label>
+                <input type="email" id="setting-email" class="form-control" disabled>
+                <small class="form-help">O e-mail é utilizado para autenticação no sistema.</small>
+              </div>
+
+              <button type="submit" class="btn btn-primary" style="margin-top: 0.5rem;">
+                <i class="fas fa-save"></i> Atualizar Perfil
+              </button>
+            </form>
+          </div>
+
+          <!-- Card de Alteração de Senha -->
+          <div class="card">
+            <h3 style="margin-bottom: 1rem;"><i class="fas fa-lock text-primary"></i> Segurança & Senha</h3>
+
+            <form id="password-settings-form">
+              <div class="form-group">
+                <label class="form-label" for="setting-new-password">Nova Senha</label>
+                <input type="password" id="setting-new-password" class="form-control" placeholder="No mínimo 6 caracteres" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="setting-confirm-password">Confirmar Nova Senha</label>
+                <input type="password" id="setting-confirm-password" class="form-control" placeholder="Repita a nova senha" required>
+              </div>
+
+              <button type="submit" class="btn btn-primary" style="margin-top: 0.5rem;">
+                <i class="fas fa-key"></i> Alterar Senha
+              </button>
+            </form>
+          </div>
+
+          <!-- Card de Preferências do Sistema -->
+          <div class="card">
+            <h3 style="margin-bottom: 1rem;"><i class="fas fa-sliders-h text-primary"></i> Preferências do Sistema</h3>
+
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid var(--border-color);">
+              <div>
+                <strong>Aparência Visual (Tema)</strong>
+                <div class="text-muted" style="font-size: 0.8125rem;">Alternar entre modo claro e modo escuro</div>
+              </div>
+              <button class="btn btn-secondary" onclick="toggleTheme()">
+                <i class="fas fa-adjust"></i> Alternar Tema
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Supabase CDN & JS Modules -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/settings.js"></script>
+</body>
+</html>

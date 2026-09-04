@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerenciamento de Eventos - RSVP Eventos</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body id="events-page">
+
+  <div class="app-layout">
+    <!-- Menu Lateral -->
+    <aside class="app-sidebar" id="app-sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand-icon">
+          <i class="fas fa-calendar-check"></i>
+        </div>
+        <span class="sidebar-brand-text">RSVP SaaS</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-item">
+          <i class="fas fa-chart-pie"></i> Dashboard
+        </a>
+        <a href="eventos.html" class="nav-item active">
+          <i class="fas fa-calendar-alt"></i> Gerenciar Eventos
+        </a>
+        <a href="confirmacoes.html" class="nav-item">
+          <i class="fas fa-check-double"></i> Confirmações
+        </a>
+        <a href="convidados-lista.html" class="nav-item">
+          <i class="fas fa-users"></i> Lista de Convidados
+        </a>
+        <a href="relatorios.html" class="nav-item">
+          <i class="fas fa-file-invoice"></i> Relatórios
+        </a>
+        <a href="configuracoes.html" class="nav-item">
+          <i class="fas fa-cog"></i> Configurações
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-profile-widget">
+          <div class="user-avatar">A</div>
+          <div class="user-info">
+            <span class="user-name">Administrador</span>
+            <span class="user-role">admin@evento.com</span>
+          </div>
+          <button class="btn-icon btn-logout" title="Sair do Sistema">
+            <i class="fas fa-sign-out-alt"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Conteúdo Principal -->
+    <div class="app-main">
+      <header class="app-topbar">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <button class="mobile-nav-toggle" onclick="document.getElementById('app-sidebar').classList.toggle('open')">
+            <i class="fas fa-bars"></i>
+          </button>
+          <h1 class="page-title-heading">Gerenciamento de Eventos</h1>
+        </div>
+
+        <div class="topbar-actions">
+          <button class="theme-toggle-btn" onclick="toggleTheme()" title="Alternar Tema Claro/Escuro">
+            <i class="fas fa-moon"></i>
+          </button>
+          <button class="btn btn-primary" onclick="openEventModal()">
+            <i class="fas fa-plus"></i> Criar Evento
+          </button>
+        </div>
+      </header>
+
+      <main class="app-content">
+        <!-- Tabela de Eventos -->
+        <div class="table-container">
+          <div class="table-toolbar">
+            <div class="table-search-box">
+              <i class="fas fa-search"></i>
+              <input type="text" id="events-search-input" class="form-control" placeholder="Buscar por título ou local...">
+            </div>
+
+            <div style="display: flex; gap: 0.75rem; align-items: center;">
+              <select id="events-status-filter" class="form-control" style="width: auto;">
+                <option value="all">Todos os Status</option>
+                <option value="active">Ativo</option>
+                <option value="draft">Rascunho</option>
+                <option value="closed">Encerrado</option>
+                <option value="archived">Arquivado</option>
+              </select>
+            </div>
+          </div>
+
+          <table class="data-table responsive-cards-table">
+            <thead>
+              <tr>
+                <th>Evento</th>
+                <th>Data e Hora</th>
+                <th>Local</th>
+                <th>Status</th>
+                <th>Link & Share</th>
+                <th style="text-align: right;">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="events-table-body">
+              <!-- Renderizado via events.js -->
+            </tbody>
+          </table>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Modal de Criar / Editar Evento -->
+  <div class="modal-overlay" id="event-modal">
+    <div class="modal-card" style="max-width: 700px;">
+      <div class="modal-header">
+        <h3 id="event-modal-title">Novo Evento</h3>
+        <button class="btn-icon" onclick="closeModal('event-modal')">&times;</button>
+      </div>
+
+      <form id="event-form">
+        <input type="hidden" id="event-id">
+
+        <div class="modal-body">
+          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label class="form-label" for="event-title">Nome do Evento <span class="required">*</span></label>
+              <input type="text" id="event-title" class="form-control" placeholder="Ex: Casamento João e Maria" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="event-type">Tipo de Evento <span class="required">*</span></label>
+              <select id="event-type" class="form-control" required>
+                <option value="Casamento">Casamento</option>
+                <option value="Aniversário">Aniversário</option>
+                <option value="Festa de 15 anos">Festa de 15 anos</option>
+                <option value="Formatura">Formatura</option>
+                <option value="Culto">Culto</option>
+                <option value="Congresso">Congresso</option>
+                <option value="Conferência">Conferência</option>
+                <option value="Evento Empresarial">Evento Empresarial</option>
+                <option value="Workshop">Workshop</option>
+                <option value="Encontro">Encontro</option>
+                <option value="Evento Familiar">Evento Familiar</option>
+                <option value="Chá de bebê">Chá de bebê</option>
+                <option value="Chá revelação">Chá revelação</option>
+                <option value="Confraternização">Confraternização</option>
+                <option value="Personalizado">Personalizado</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label class="form-label" for="event-slug">Identificador URL (Slug) <span class="required">*</span></label>
+              <input type="text" id="event-slug" class="form-control" placeholder="casamento-joao-maria" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="event-status">Status do Evento</label>
+              <select id="event-status" class="form-control">
+                <option value="active">Ativo (Permite confirmações)</option>
+                <option value="draft">Rascunho (Em edição)</option>
+                <option value="closed">Encerrado (Bloqueia confirmações)</option>
+                <option value="archived">Arquivado</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label class="form-label" for="event-date">Data do Evento <span class="required">*</span></label>
+              <input type="date" id="event-date" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="event-time">Horário de Início</label>
+              <input type="time" id="event-time" class="form-control">
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label class="form-label" for="event-location">Nome do Local <span class="required">*</span></label>
+              <input type="text" id="event-location" class="form-control" placeholder="Ex: Espaço Villa das Flores" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="event-address">Endereço Completo</label>
+              <input type="text" id="event-address" class="form-control" placeholder="Av. das Flores, 100 - Bairro">
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label class="form-label" for="event-host">Nome do Anfitrião</label>
+              <input type="text" id="event-host" class="form-control" placeholder="Noivos / Anfitrião">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="event-phone">Telefone de Contato</label>
+              <input type="text" id="event-phone" class="form-control" placeholder="(00) 00000-0000" oninput="this.value = applyPhoneMask(this.value)">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="event-email">E-mail de Contato</label>
+              <input type="email" id="event-email" class="form-control" placeholder="contato@evento.com">
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label class="form-label" for="event-primary-color">Cor Principal</label>
+              <input type="color" id="event-primary-color" class="form-control" style="height: 42px; padding: 0.2rem;" value="#4f46e5">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="event-secondary-color">Cor Secundária</label>
+              <input type="color" id="event-secondary-color" class="form-control" style="height: 42px; padding: 0.2rem;" value="#ec4899">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="event-deadline">Data Limite de RSVP</label>
+              <input type="datetime-local" id="event-deadline" class="form-control">
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label class="form-label" for="event-max-guests">Limite Total de Convidados (Opcional)</label>
+              <input type="number" id="event-max-guests" class="form-control" placeholder="Sem limite">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="event-max-per-invite">Máximo de Pessoas por Convite</label>
+              <input type="number" id="event-max-per-invite" class="form-control" value="4" min="1" max="20">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="event-cover">URL da Imagem / Capa do Evento</label>
+            <input type="url" id="event-cover" class="form-control" placeholder="https://exemplo.com/imagem-capa.jpg">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="event-welcome-msg">Mensagem Inicial (Acolhimento)</label>
+            <textarea id="event-welcome-msg" class="form-control" rows="2" placeholder="Ficaremos muito felizes com a sua presença!"></textarea>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label class="form-label" for="event-confirm-msg">Mensagem de Presença Confirmada</label>
+              <textarea id="event-confirm-msg" class="form-control" rows="2"></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="event-reject-msg">Mensagem para quando Não Puder Comparecer</label>
+              <textarea id="event-reject-msg" class="form-control" rows="2"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('event-modal')">Cancelar</button>
+          <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> Criar Evento</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal de Compartilhamento & QR Code -->
+  <div class="modal-overlay" id="share-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Compartilhar Evento & QR Code</h3>
+        <button class="btn-icon" onclick="closeModal('share-modal')">&times;</button>
+      </div>
+      <div class="modal-body text-center">
+        <p class="text-muted" style="margin-bottom: 1rem; font-size: 0.875rem;">
+          Utilize o QR Code ou copie o link exclusivo abaixo para enviar aos seus convidados.
+        </p>
+
+        <!-- Container do QR Code -->
+        <div id="qrcode-container" style="display: flex; justify-content: center; margin: 1rem 0;"></div>
+
+        <div class="form-group" style="margin-top: 1rem;">
+          <label class="form-label">Link Exclusivo de Confirmação</label>
+          <div style="display: flex; gap: 0.5rem;">
+            <input type="text" id="share-link-input" class="form-control" readonly>
+            <button type="button" class="btn btn-primary" onclick="copyEventLink(document.getElementById('share-link-input').value)">
+              <i class="fas fa-copy"></i> Copiar
+            </button>
+          </div>
+        </div>
+
+        <div style="margin-top: 1.5rem;">
+          <a id="share-whatsapp-btn" href="#" target="_blank" class="btn btn-primary" style="background-color: #25D366; border-color: #25D366; width: 100%;">
+            <i class="fab fa-whatsapp"></i> Compartilhar pelo WhatsApp
+          </a>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('share-modal')">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Library QRCode.js CDN & Core JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/events.js"></script>
+</body>
+</html>

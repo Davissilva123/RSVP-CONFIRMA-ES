@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - RSVP Eventos</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/auth.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/public-rsvp.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+
+<body id="dashboard-page">
+
+  <div class="app-layout">
+    <!-- Menu Lateral -->
+    <aside class="app-sidebar" id="app-sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand-icon">
+          <i class="fas fa-calendar-check"></i>
+        </div>
+        <span class="sidebar-brand-text">RSVP SaaS</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-item active">
+          <i class="fas fa-chart-pie"></i> <span>Dashboard</span>
+        </a>
+        <a href="eventos.html" class="nav-item">
+          <i class="fas fa-calendar-alt"></i> <span>Gerenciar Eventos</span>
+        </a>
+        <a href="confirmacoes.html" class="nav-item">
+          <i class="fas fa-check-double"></i> <span>Confirmações</span>
+        </a>
+        <a href="convidados-lista.html" class="nav-item">
+          <i class="fas fa-users"></i> <span>Lista de Convidados</span>
+        </a>
+        <a href="relatorios.html" class="nav-item">
+          <i class="fas fa-file-invoice"></i> <span>Relatórios</span>
+        </a>
+        <a href="configuracoes.html" class="nav-item">
+          <i class="fas fa-cog"></i> <span>Configurações</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-profile-widget">
+          <div class="user-avatar">A</div>
+          <div class="user-info">
+            <span class="user-name">Administrador</span>
+            <span class="user-role">admin@evento.com</span>
+          </div>
+          <button class="btn-icon btn-logout" title="Sair do Sistema">
+            <i class="fas fa-sign-out-alt"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Conteúdo Principal -->
+    <div class="app-main">
+      <header class="app-topbar">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <button type="button" class="sidebar-toggle-btn" id="sidebarToggle" title="Recolher/expandir menu"
+            aria-label="Recolher menu lateral">
+            <i class="fas fa-angles-left"></i>
+          </button>
+          <button class="mobile-nav-toggle" onclick="document.getElementById('app-sidebar').classList.toggle('open')">
+            <i class="fas fa-bars"></i>
+          </button>
+          <h1 class="page-title-heading">Visão Geral & Dashboard</h1>
+        </div>
+
+        <div class="topbar-actions">
+          <button type="button" class="theme-toggle-btn" onclick="toggleTheme()" title="Alternar Tema Claro/Escuro">
+            <i class="fas fa-moon"></i>
+          </button>
+        </div>
+      </header>
+
+      <main class="app-content">
+
+        <!-- Stats Cards Grid (Linha 1) -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-info">
+              <span class="stat-value" id="metric-total-events">0</span>
+              <span class="stat-label">Total de Eventos</span>
+            </div>
+            <div class="stat-icon-wrapper stat-icon-primary">
+              <i class="fas fa-calendar-alt"></i>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-info">
+              <span class="stat-value" id="metric-total-guests">0</span>
+              <span class="stat-label">Convidados Cadastrados</span>
+            </div>
+            <div class="stat-icon-wrapper stat-icon-info">
+              <i class="fas fa-users"></i>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-info">
+              <span class="stat-value" id="metric-confirmations-received">0</span>
+              <span class="stat-label">Respostas Recebidas</span>
+            </div>
+            <div class="stat-icon-wrapper stat-icon-warning">
+              <i class="fas fa-comment-dots"></i>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-info">
+              <span class="stat-value" id="metric-people-attending">0</span>
+              <span class="stat-label">Pessoas Confirmadas</span>
+            </div>
+            <div class="stat-icon-wrapper stat-icon-success">
+              <i class="fas fa-check-circle"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats Cards Grid (Linha 2) -->
+        <div class="stats-grid" style="margin-bottom: 2rem;">
+          <div class="stat-card">
+            <div class="stat-info">
+              <span class="stat-value" id="metric-declined">0</span>
+              <span class="stat-label">Não Irão (Recusas)</span>
+            </div>
+            <div class="stat-icon-wrapper stat-icon-danger">
+              <i class="fas fa-times-circle"></i>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-info">
+              <span class="stat-value" id="metric-pending">0</span>
+              <span class="stat-label">Pendentes</span>
+            </div>
+            <div class="stat-icon-wrapper stat-icon-warning"
+              style="background-color: rgba(245, 158, 11, 0.1); color: #f59e0b;">
+              <i class="fas fa-clock"></i>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-info">
+              <span class="stat-value" id="metric-received-today">0</span>
+              <span class="stat-label">Recebidas Hoje</span>
+            </div>
+            <div class="stat-icon-wrapper stat-icon-primary">
+              <i class="fas fa-bolt"></i>
+            </div>
+          </div>
+
+          <!-- Card Invisível apenas para manter o alinhamento do Grid de 4 colunas -->
+          <div class="stat-card" style="visibility: hidden;"></div>
+        </div>
+
+        <!-- Charts Layout Grid -->
+        <div class="charts-grid">
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <h3 style="font-size: 1rem; font-weight: 700; color: var(--text-primary);">Pessoas Confirmadas por Evento
+              </h3>
+            </div>
+            <div class="chart-container">
+              <canvas id="eventsBarChart"></canvas>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <h3 style="font-size: 1rem; font-weight: 700; color: var(--text-primary);">Status das Confirmações</h3>
+            </div>
+            <div class="chart-container">
+              <canvas id="attendanceDoughnutChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Data Table (Atividade Recente) -->
+        <div class="table-container">
+          <div class="table-toolbar">
+            <h3 style="font-size: 1rem; font-weight: 700; margin: 0; color: var(--text-primary);">Atividade Recente
+              (Tempo Real)</h3>
+            <span
+              style="font-size: 0.75rem; color: #10b981; display: flex; align-items: center; gap: 0.25rem; font-weight: 600;">
+              <i class="fas fa-circle" style="font-size: 0.5rem;"></i> Live Updates Ativo
+            </span>
+          </div>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Convidado</th>
+                <th>Evento</th>
+                <th>Status</th>
+                <th>Total Pessoas</th>
+                <th>Data da Confirmação</th>
+              </tr>
+            </thead>
+            <tbody id="recent-activity-table-body">
+              <tr>
+                <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">Carregando
+                  atividades...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Supabase CDN, Chart.js & JS Modules -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/events.js"></script>
+  <script src="js/form-builder.js"></script>
+  <script src="js/confirmations.js"></script>
+  <script src="js/guest-list.js"></script>
+  <script src="js/reports.js"></script>
+  <script src="js/settings.js"></script>
+  <script src="js/public-confirmation.js"></script>
+
+  <!-- Recolher/expandir sidebar (persiste a preferência no navegador) -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const layout = document.querySelector('.app-layout');
+      const toggleBtn = document.getElementById('sidebarToggle');
+      if (!layout || !toggleBtn) return;
+      if (localStorage.getItem('sidebarCollapsed') === 'true') {
+        layout.classList.add('collapsed');
+      }
+      toggleBtn.addEventListener('click', () => {
+        const isCollapsed = layout.classList.toggle('collapsed');
+        localStorage.setItem('sidebarCollapsed', String(isCollapsed));
+      });
+    });
+  </script>
+</body>
+
+</html>

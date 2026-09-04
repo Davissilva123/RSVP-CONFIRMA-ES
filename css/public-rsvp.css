@@ -1,0 +1,287 @@
+/* ==============================================================================
+   PUBLIC RSVP PAGE STYLES (GUEST EXPERIENCE)
+   ============================================================================== */
+
+:root {
+  --event-primary: #4f46e5;
+  --event-secondary: #ec4899;
+}
+
+.public-body {
+  background-color: var(--bg-primary);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: 1.5rem 1rem 3rem 1rem;
+}
+
+.public-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.event-card-public {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-xl);
+}
+
+/* Event Cover Banner */
+.event-cover-banner {
+  width: 100%;
+  height: 220px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  background-color: var(--event-primary);
+}
+
+.event-cover-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.1) 60%);
+  display: flex;
+  align-items: flex-end;
+  padding: 1.5rem;
+}
+
+.event-badge-type {
+  background-color: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
+  color: #ffffff;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+
+.event-header-content {
+  padding: 1.5rem 1.5rem 1rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.event-title-public {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.25;
+}
+
+.event-host-name {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+/* Event Info Cards */
+.event-details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  background-color: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.event-info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.event-info-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-md);
+  background-color: var(--bg-card);
+  color: var(--event-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.125rem;
+  box-shadow: var(--shadow-sm);
+  flex-shrink: 0;
+}
+
+.event-info-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.event-info-val {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* Countdown Display Box */
+.countdown-box {
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, var(--event-primary), var(--event-secondary));
+  color: #ffffff;
+  text-align: center;
+}
+
+.countdown-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.9;
+}
+
+.countdown-timer {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.countdown-unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.countdown-number {
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.countdown-label {
+  font-size: 0.6875rem;
+  opacity: 0.8;
+  margin-top: 0.2rem;
+}
+
+/* Welcome Message */
+.event-welcome-msg {
+  padding: 1.25rem 1.5rem;
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Attendance Option Selector Cards */
+.attendance-selector {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.attendance-card {
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  background-color: var(--bg-card);
+  user-select: none;
+}
+
+.attendance-card:hover {
+  border-color: var(--event-primary);
+}
+
+.attendance-card.selected-yes {
+  border-color: var(--success);
+  background-color: var(--success-bg);
+  color: var(--success-text);
+}
+
+.attendance-card.selected-no {
+  border-color: var(--danger);
+  background-color: var(--danger-bg);
+  color: var(--danger-text);
+}
+
+.attendance-icon {
+  font-size: 1.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.attendance-title {
+  font-weight: 700;
+  font-size: 0.9375rem;
+}
+
+/* Companion Controls */
+.companion-counter-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background-color: var(--bg-tertiary);
+  border-radius: var(--radius-md);
+  margin-bottom: 0.75rem;
+}
+
+.counter-btn-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.counter-btn {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.125rem;
+}
+
+.counter-value {
+  font-size: 1.125rem;
+  font-weight: 800;
+  width: 1.5rem;
+  text-align: center;
+}
+
+/* Confirmation Success Screen */
+.success-screen {
+  text-align: center;
+  padding: 3rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.animated-checkmark {
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 50%;
+  background-color: var(--success-bg);
+  color: var(--success);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.25rem;
+  box-shadow: 0 0 0 10px rgba(16, 185, 129, 0.15);
+  animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+  from { transform: scale(0); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}

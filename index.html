@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema de Confirmação de Presença (RSVP)</title>
+  <meta name="description" content="Plataforma completa e moderna de Gestão de Confirmação de Presença para Casamentos, Aniversários, Festas e Eventos Corporativos.">
+  
+  <!-- Google Fonts & Font Awesome Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- CSS Global & Estilos da Landing Page -->
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  
+  <style>
+    .hero-section {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 3rem 1.5rem;
+      background: radial-gradient(circle at 50% 20%, rgba(79, 70, 229, 0.12), transparent 50%),
+                  radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.12), transparent 50%),
+                  var(--bg-primary);
+    }
+    
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1.25rem;
+      background-color: var(--primary-light);
+      color: var(--primary-text);
+      border-radius: var(--radius-full);
+      font-size: 0.875rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      border: 1px solid rgba(79, 70, 229, 0.2);
+    }
+
+    .hero-title {
+      font-size: clamp(2.25rem, 5vw, 3.75rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      max-width: 850px;
+      margin-bottom: 1.25rem;
+    }
+
+    .hero-title span {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      color: var(--text-secondary);
+      max-width: 650px;
+      margin-bottom: 2.5rem;
+      line-height: 1.6;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+
+  <main class="hero-section">
+    <div class="hero-badge">
+      <i class="fas fa-sparkles"></i> Plataforma SaaS de Confirmação de Presença
+    </div>
+
+    <h1 class="hero-title">Gestão Inteligente de <span>RSVP</span> para todos os seus Eventos</h1>
+
+    <p class="hero-subtitle">
+      Crie eventos personalizados, construa formulários exclusivos, acompanhe confirmações em tempo real e encante seus convidados com uma experiência inesquecível.
+    </p>
+
+    <div class="hero-actions">
+      <a href="login.html" class="btn btn-primary btn-lg">
+        <i class="fas fa-sign-in-alt"></i> Acessar Painel Administrativo
+      </a>
+      <a href="confirmacao.html?slug=casamento-joao-maria" class="btn btn-secondary btn-lg">
+        <i class="fas fa-eye"></i> Ver Demonstração de RSVP
+      </a>
+    </div>
+  </main>
+
+  <!-- Supabase CDN & Core Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+</body>
+</html>

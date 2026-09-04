@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confirmação de Presença - RSVP</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/public-rsvp.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body class="public-body" id="public-rsvp-page">
+
+  <main class="public-container" id="public-rsvp-container">
+    <!-- Renderizado dinamicamente via public-confirmation.js -->
+    <div class="event-card-public" style="padding: 4rem 1.5rem; text-align: center;">
+      <div class="skeleton" style="width: 3rem; height: 3rem; border-radius: 50%; margin: 0 auto 1rem auto;"></div>
+      <div class="skeleton" style="width: 60%; height: 1.5rem; margin: 0 auto 0.5rem auto;"></div>
+      <div class="skeleton" style="width: 40%; height: 1rem; margin: 0 auto;"></div>
+    </div>
+  </main>
+
+  <!-- Supabase CDN & JS Modules -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/public-confirmation.js"></script>
+</body>
+</html>

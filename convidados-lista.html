@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lista Prévia de Convidados - RSVP Eventos</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body id="guest-list-page">
+
+  <div class="app-layout">
+    <!-- Menu Lateral -->
+    <aside class="app-sidebar" id="app-sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand-icon">
+          <i class="fas fa-calendar-check"></i>
+        </div>
+        <span class="sidebar-brand-text">RSVP SaaS</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-item">
+          <i class="fas fa-chart-pie"></i> Dashboard
+        </a>
+        <a href="eventos.html" class="nav-item">
+          <i class="fas fa-calendar-alt"></i> Gerenciar Eventos
+        </a>
+        <a href="confirmacoes.html" class="nav-item">
+          <i class="fas fa-check-double"></i> Confirmações
+        </a>
+        <a href="convidados-lista.html" class="nav-item active">
+          <i class="fas fa-users"></i> Lista de Convidados
+        </a>
+        <a href="relatorios.html" class="nav-item">
+          <i class="fas fa-file-invoice"></i> Relatórios
+        </a>
+        <a href="configuracoes.html" class="nav-item">
+          <i class="fas fa-cog"></i> Configurações
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-profile-widget">
+          <div class="user-avatar">A</div>
+          <div class="user-info">
+            <span class="user-name">Administrador</span>
+            <span class="user-role">admin@evento.com</span>
+          </div>
+          <button class="btn-icon btn-logout" title="Sair do Sistema">
+            <i class="fas fa-sign-out-alt"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Conteúdo Principal -->
+    <div class="app-main">
+      <header class="app-topbar">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <button class="mobile-nav-toggle" onclick="document.getElementById('app-sidebar').classList.toggle('open')">
+            <i class="fas fa-bars"></i>
+          </button>
+          <h1 class="page-title-heading">Lista Prévia & Códigos de Convite</h1>
+        </div>
+
+        <div class="topbar-actions">
+          <button class="theme-toggle-btn" onclick="toggleTheme()" title="Alternar Tema Claro/Escuro">
+            <i class="fas fa-moon"></i>
+          </button>
+          <button class="btn btn-primary" onclick="openGuestModal()">
+            <i class="fas fa-user-plus"></i> Novo Convidado
+          </button>
+        </div>
+      </header>
+
+      <main class="app-content">
+        <div class="table-container">
+          <div class="table-toolbar">
+            <div class="table-search-box">
+              <i class="fas fa-search"></i>
+              <input type="text" id="guest-search-input" class="form-control" placeholder="Buscar por nome, código ou grupo...">
+            </div>
+
+            <div>
+              <select id="guest-event-filter" class="form-control" style="width: auto;">
+                <option value="all">Todos os Eventos</option>
+              </select>
+            </div>
+          </div>
+
+          <table class="data-table responsive-cards-table">
+            <thead>
+              <tr>
+                <th>Nome do Convidado</th>
+                <th>Evento</th>
+                <th>Código de Convite</th>
+                <th>Grupo / Família</th>
+                <th>Limite Acompanhantes</th>
+                <th>Status</th>
+                <th style="text-align: right;">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="guest-table-body">
+              <!-- Renderizado via guest-list.js -->
+            </tbody>
+          </table>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Modal Cadastrar Convidado -->
+  <div class="modal-overlay" id="guest-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Cadastrar Convidado Antecipado</h3>
+        <button class="btn-icon" onclick="closeModal('guest-modal')">&times;</button>
+      </div>
+
+      <form id="guest-form" onsubmit="event.preventDefault(); saveGuest();">
+        <input type="hidden" id="guest-id">
+
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Evento <span class="required">*</span></label>
+            <select id="guest-event-id" class="form-control" required></select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Nome Completo <span class="required">*</span></label>
+            <input type="text" id="guest-name" class="form-control" placeholder="Ex: Família Santos / João Silva" required>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label class="form-label">Código do Convite <span class="required">*</span></label>
+              <input type="text" id="guest-code" class="form-control" style="text-transform: uppercase;" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Limite Acompanhantes</label>
+              <input type="number" id="guest-max-companions" class="form-control" value="0" min="0" max="20">
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label class="form-label">Telefone</label>
+              <input type="text" id="guest-phone" class="form-control" oninput="this.value = applyPhoneMask(this.value)">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Grupo / Família</label>
+              <input type="text" id="guest-group" class="form-control" placeholder="Ex: Amigos da Noiva, VIP">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">E-mail</label>
+            <input type="email" id="guest-email" class="form-control" placeholder="opcional@email.com">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('guest-modal')">Cancelar</button>
+          <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Salvar Convidado</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Supabase CDN & JS Modules -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/guest-list.js"></script>
+</body>
+</html>
