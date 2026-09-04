@@ -625,6 +625,9 @@ window.handlePublicSubmit = async function (e) {
     // Inserir registro de confirmação
     const confPayload = {
       event_id: currentEvent.id,
+      // FIX: guest_id vincula a confirmação ao registro da lista de convidados,
+      // quando o convidado foi identificado pela busca.
+      guest_id: selectedGuest ? selectedGuest.id : null,
       name,
       phone,
       email,
@@ -632,8 +635,10 @@ window.handlePublicSubmit = async function (e) {
       attendance_status: selectedAttendance,
       adults: selectedAttendance === 'confirmed' ? adultCount : 0,
       children: selectedAttendance === 'confirmed' ? childCount : 0,
-      companions: 0,
-      total_people: selectedAttendance === 'confirmed' ? (adultCount + childCount) : 0
+      companions: 0
+      // FIX: total_people é coluna GENERATED ALWAYS (adults + children + companions)
+      // no Postgres — não pode ser enviada no insert, o banco calcula sozinho.
+      // Era isso que fazia todo envio de confirmação falhar.
     };
 
     const { data: conf, error: confErr } = await supabase.from('confirmations').insert([confPayload]).select().single();
