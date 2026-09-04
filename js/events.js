@@ -243,7 +243,14 @@ async function saveEvent() {
     if (id) {
       res = await supabase.from('events').update(payload).eq('id', id);
     } else {
-      res = await supabase.from('events').insert([payload]);
+      // FIX: a política RLS da tabela events exige auth.uid() = user_id.
+      // Sem preencher esse campo no insert, o Postgres rejeita a linha.
+      const { data: userData, error: userErr } = await supabase.auth.getUser();
+      if (userErr || !userData?.user) {
+        window.showToast('Sua sessão expirou. Faça login novamente para criar eventos.', 'error');
+        return;
+      }
+      res = await supabase.from('events').insert([{ ...payload, user_id: userData.user.id }]);
     }
 
     if (res.error) throw res.error;
