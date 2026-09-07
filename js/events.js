@@ -181,7 +181,11 @@ window.openEventModal = function (eventId = null) {
       document.getElementById('event-welcome-msg').value = event.welcome_message || '';
       document.getElementById('event-confirm-msg').value = event.confirmation_message || '';
       document.getElementById('event-reject-msg').value = event.rejection_message || '';
-      document.getElementById('event-deadline').value = event.confirmation_deadline ? event.confirmation_deadline.substring(0, 16) : '';
+      // FIX: confirmation_deadline é salvo em UTC no banco. Se só cortarmos a
+      // string (substring), o campo mostra o horário em UTC como se fosse local,
+      // exibindo um horário errado pro organizador. Convertendo pra Date primeiro,
+      // pegamos o horário local correto.
+      document.getElementById('event-deadline').value = event.confirmation_deadline ? toLocalDatetimeInputValue(event.confirmation_deadline) : '';
       document.getElementById('event-max-guests').value = event.max_guests || '';
       document.getElementById('event-max-per-invite').value = event.max_guests_per_invite || 4;
       document.getElementById('event-status').value = event.status || 'active';
@@ -199,6 +203,20 @@ window.openEventModal = function (eventId = null) {
 
   openModal('event-modal');
 };
+
+// FIX: converte um timestamp UTC (vindo do Supabase) pro formato local
+// "YYYY-MM-DDTHH:mm" que o <input type="datetime-local"> espera, evitando
+// mostrar o horário errado (deslocado pelo fuso) ao editar um evento.
+function toLocalDatetimeInputValue(isoString) {
+  const d = new Date(isoString);
+  const pad = (n) => String(n).padStart(2, '0');
+  const year = d.getFullYear();
+  const month = pad(d.getMonth() + 1);
+  const day = pad(d.getDate());
+  const hours = pad(d.getHours());
+  const mins = pad(d.getMinutes());
+  return `${year}-${month}-${day}T${hours}:${mins}`;
+}
 
 async function saveEvent() {
   const id = document.getElementById('event-id').value;
@@ -219,7 +237,14 @@ async function saveEvent() {
   const welcome_message = document.getElementById('event-welcome-msg').value.trim();
   const confirmation_message = document.getElementById('event-confirm-msg').value.trim();
   const rejection_message = document.getElementById('event-reject-msg').value.trim();
-  const confirmation_deadline = document.getElementById('event-deadline').value || null;
+  // FIX: o <input type="datetime-local"> devolve uma string sem fuso horário
+  // (ex: "2026-09-10T18:00"). Enviar isso direto pro Postgres faz o banco
+  // interpretar como UTC, adiantando o prazo em várias horas (no Brasil, 3h) —
+  // por isso confirmações de convidados eram bloqueadas por RLS mesmo antes do
+  // horário que o organizador realmente definiu. new Date(...) interpreta a
+  // string como horário LOCAL do navegador, e toISOString() converte pra UTC certo.
+  const deadlineRaw = document.getElementById('event-deadline').value;
+  const confirmation_deadline = deadlineRaw ? new Date(deadlineRaw).toISOString() : null;
   const max_guests = document.getElementById('event-max-guests').value ? parseInt(document.getElementById('event-max-guests').value) : null;
   const max_guests_per_invite = parseInt(document.getElementById('event-max-per-invite').value) || 4;
   const status = document.getElementById('event-status').value;
