@@ -700,6 +700,15 @@ window.handlePublicSubmit = async function (e) {
       updated_at: new Date().toISOString(),
     };
 
+    // DEBUG TEMPORÁRIO: confirma exatamente o que está sendo enviado
+    console.log("DEBUG confPayload:", confPayload);
+    console.log("DEBUG currentEvent.id:", currentEvent && currentEvent.id);
+    console.log("DEBUG currentEvent.slug:", currentEvent && currentEvent.slug);
+    console.log("DEBUG window.location.href:", window.location.href);
+    try {
+      console.log("DEBUG localStorage slug:", localStorage.getItem("rsvp_preview_event_slug"));
+    } catch (e) { }
+
     const { data: conf, error: confErr } = await supabase
       .from("confirmations")
       .insert([confPayload])
