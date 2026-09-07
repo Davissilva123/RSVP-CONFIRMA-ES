@@ -243,9 +243,8 @@ function renderEventPublicView() {
       </div>
 
       <!-- Contagem Regressiva -->
-      ${
-        currentEvent.countdown_enabled
-          ? `
+      ${currentEvent.countdown_enabled
+      ? `
         <div class="countdown-box">
           <div class="countdown-title"><i class="fas fa-hourglass-half"></i> Contagem Regressiva para o Evento</div>
           <div class="countdown-timer" id="countdown-display">
@@ -256,20 +255,19 @@ function renderEventPublicView() {
           </div>
         </div>
       `
-          : ""
-      }
+      : ""
+    }
 
       <!-- Mensagem Inicial -->
-      ${
-        currentEvent.welcome_message
-          ? `
+      ${currentEvent.welcome_message
+      ? `
         <div class="event-welcome-msg">
           <i class="fas fa-quote-left text-muted" style="margin-right: 0.5rem;"></i>
           ${escapeHTML(currentEvent.welcome_message)}
         </div>
       `
-          : ""
-      }
+      : ""
+    }
 
       <!-- Formulario de Confirmação -->
       <form id="public-rsvp-form" style="padding: 1.5rem;" onsubmit="handlePublicSubmit(event)">
@@ -290,17 +288,16 @@ function renderEventPublicView() {
 
         <!-- Seção de Dados Principais -->
         <div id="rsvp-fields-section" style="display: none;">
-          ${
-            currentEvent.require_invitation_code
-              ? `
+          ${currentEvent.require_invitation_code
+      ? `
             <div class="form-group">
               <label class="form-label">Código do Convite <span class="required">*</span></label>
               <input type="text" id="rsvp-invitation-code" class="form-control" placeholder="Ex: AB1234" style="text-transform: uppercase;">
               <small class="form-help">Informe o código impresso no seu convite.</small>
             </div>
           `
-              : ""
-          }
+      : ""
+    }
 
           <div id="guest-search-group">
             ${renderGuestSearchBoxHTML()}
@@ -772,8 +769,13 @@ window.handlePublicSubmit = async function (e) {
     renderConfirmationSuccessScreen();
   } catch (err) {
     console.error("Erro ao enviar confirmação:", err);
+    // DEBUG TEMPORÁRIO: mostra a mensagem real do Supabase na tela para
+    // diagnosticar o problema. Reverter para a mensagem genérica depois.
+    const debugMsg =
+      (err && (err.message || err.error_description || err.hint)) ||
+      JSON.stringify(err);
     window.showToast(
-      "Não foi possível registrar sua resposta. Tente novamente.",
+      "Erro ao registrar: " + debugMsg,
       "error",
     );
     submitBtn.disabled = false;
@@ -790,7 +792,7 @@ function renderConfirmationSuccessScreen() {
   const messageText = isConfirmed
     ? currentEvent.confirmation_message || "Presença confirmada com sucesso!"
     : currentEvent.rejection_message ||
-      "Sua resposta foi salva. Obrigado por nos avisar!";
+    "Sua resposta foi salva. Obrigado por nos avisar!";
 
   container.innerHTML = `
     <div class="event-card-public">
