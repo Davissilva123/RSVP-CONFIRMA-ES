@@ -243,8 +243,9 @@ function renderEventPublicView() {
       </div>
 
       <!-- Contagem Regressiva -->
-      ${currentEvent.countdown_enabled
-      ? `
+      ${
+        currentEvent.countdown_enabled
+          ? `
         <div class="countdown-box">
           <div class="countdown-title"><i class="fas fa-hourglass-half"></i> Contagem Regressiva para o Evento</div>
           <div class="countdown-timer" id="countdown-display">
@@ -255,19 +256,20 @@ function renderEventPublicView() {
           </div>
         </div>
       `
-      : ""
-    }
+          : ""
+      }
 
       <!-- Mensagem Inicial -->
-      ${currentEvent.welcome_message
-      ? `
+      ${
+        currentEvent.welcome_message
+          ? `
         <div class="event-welcome-msg">
           <i class="fas fa-quote-left text-muted" style="margin-right: 0.5rem;"></i>
           ${escapeHTML(currentEvent.welcome_message)}
         </div>
       `
-      : ""
-    }
+          : ""
+      }
 
       <!-- Formulario de Confirmação -->
       <form id="public-rsvp-form" style="padding: 1.5rem;" onsubmit="handlePublicSubmit(event)">
@@ -288,16 +290,17 @@ function renderEventPublicView() {
 
         <!-- Seção de Dados Principais -->
         <div id="rsvp-fields-section" style="display: none;">
-          ${currentEvent.require_invitation_code
-      ? `
+          ${
+            currentEvent.require_invitation_code
+              ? `
             <div class="form-group">
               <label class="form-label">Código do Convite <span class="required">*</span></label>
               <input type="text" id="rsvp-invitation-code" class="form-control" placeholder="Ex: AB1234" style="text-transform: uppercase;">
               <small class="form-help">Informe o código impresso no seu convite.</small>
             </div>
           `
-      : ""
-    }
+              : ""
+          }
 
           <div id="guest-search-group">
             ${renderGuestSearchBoxHTML()}
@@ -679,7 +682,17 @@ window.handlePublicSubmit = async function (e) {
     // IMPORTANTE: total_people é calculado no banco e não deve ser enviado em INSERT;
     // também enviamos created_at/updated_at explicitamente para deixar o registro compatível
     // com versões antigas do schema do projeto e com o Trigger de auditoria.
+    // FIX: geramos o id no navegador (crypto.randomUUID) para NÃO precisar pedir
+    // ao Supabase que devolva a linha inserida (.select()). Pedir a linha de volta
+    // exige uma política de SELECT pública na tabela confirmations, que exporia
+    // nome/telefone/e-mail de todos os convidados para qualquer visitante do link
+    // — por isso não usamos RETURNING aqui, e sim geramos o id de antemão.
+    const generatedId =
+      (window.crypto && window.crypto.randomUUID && window.crypto.randomUUID()) ||
+      `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+
     const confPayload = {
+      id: generatedId,
       event_id: currentEvent.id,
       guest_id: selectedGuest ? selectedGuest.id : null,
       name,
@@ -700,22 +713,16 @@ window.handlePublicSubmit = async function (e) {
       updated_at: new Date().toISOString(),
     };
 
-    // DEBUG TEMPORÁRIO: confirma exatamente o que está sendo enviado
-    console.log("DEBUG confPayload:", confPayload);
-    console.log("DEBUG currentEvent.id:", currentEvent && currentEvent.id);
-    console.log("DEBUG currentEvent.slug:", currentEvent && currentEvent.slug);
-    console.log("DEBUG window.location.href:", window.location.href);
-    try {
-      console.log("DEBUG localStorage slug:", localStorage.getItem("rsvp_preview_event_slug"));
-    } catch (e) { }
-
-    const { data: conf, error: confErr } = await supabase
+    // FIX: insert "puro", sem .select() — não pedimos a linha de volta (ver
+    // comentário acima sobre RETURNING exigir política de SELECT). Já sabemos
+    // o id (foi gerado acima), então seguimos usando `conf.id` normalmente.
+    const { error: confErr } = await supabase
       .from("confirmations")
-      .insert([confPayload])
-      .select()
-      .single();
+      .insert([confPayload]);
 
     if (confErr) throw confErr;
+
+    const conf = { id: generatedId };
 
     // Coletar e inserir respostas personalizadas
     if (currentCustomFields.length > 0 && conf) {
@@ -778,13 +785,8 @@ window.handlePublicSubmit = async function (e) {
     renderConfirmationSuccessScreen();
   } catch (err) {
     console.error("Erro ao enviar confirmação:", err);
-    // DEBUG TEMPORÁRIO: mostra a mensagem real do Supabase na tela para
-    // diagnosticar o problema. Reverter para a mensagem genérica depois.
-    const debugMsg =
-      (err && (err.message || err.error_description || err.hint)) ||
-      JSON.stringify(err);
     window.showToast(
-      "Erro ao registrar: " + debugMsg,
+      "Não foi possível registrar sua resposta. Tente novamente.",
       "error",
     );
     submitBtn.disabled = false;
@@ -801,7 +803,7 @@ function renderConfirmationSuccessScreen() {
   const messageText = isConfirmed
     ? currentEvent.confirmation_message || "Presença confirmada com sucesso!"
     : currentEvent.rejection_message ||
-    "Sua resposta foi salva. Obrigado por nos avisar!";
+      "Sua resposta foi salva. Obrigado por nos avisar!";
 
   container.innerHTML = `
     <div class="event-card-public">
