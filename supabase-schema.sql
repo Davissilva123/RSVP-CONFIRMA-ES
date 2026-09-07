@@ -178,7 +178,7 @@ $$ language 'plpgsql';
 
 CREATE TRIGGER update_events_updated_at BEFORE UPDATE ON public.events FOR EACH ROW EXECUTE PROCEDURE update_timestamp_column();
 CREATE TRIGGER update_profiles_updated_at BEFORE UPDATE ON public.profiles FOR EACH ROW EXECUTE PROCEDURE update_timestamp_column();
-CREATE TRIGGER update_confirmations_updated_at BEFORE UPDATE ON public.confirmations FOR EACH ROW EXECUTE PROCEDURE update_timestamp_column();
+CREATE TRIGGER update_confirmations_updated_at BEFORE INSERT OR UPDATE ON public.confirmations FOR EACH ROW EXECUTE PROCEDURE update_timestamp_column();
 
 
 -- ------------------------------------------------------------------------------

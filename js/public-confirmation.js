@@ -11,8 +11,8 @@ let adultCount = 1;
 let childCount = 0;
 let companionCount = 0;
 
-document.addEventListener('DOMContentLoaded', async () => {
-  if (!document.getElementById('public-rsvp-page')) return;
+document.addEventListener("DOMContentLoaded", async () => {
+  if (!document.getElementById("public-rsvp-page")) return;
 
   const params = getQueryParams();
   let slug = params.slug;
@@ -24,14 +24,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   // compartilhado com convidados sempre chega com a query string intacta.
   if (!slug && !id) {
     try {
-      slug = localStorage.getItem('rsvp_preview_event_slug');
+      slug = localStorage.getItem("rsvp_preview_event_slug");
     } catch (e) {
       slug = null;
     }
   }
 
   if (!slug && !id) {
-    showErrorState('Evento não encontrado', 'O link informado parece ser inválido ou incompleto.');
+    showErrorState(
+      "Evento não encontrado",
+      "O link informado parece ser inválido ou incompleto.",
+    );
     return;
   }
 
@@ -41,29 +44,40 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function loadPublicEvent(slug, id) {
   try {
     const supabase = window.supabaseClient;
-    let query = supabase.from('events').select('*');
+    let query = supabase.from("events").select("*");
 
     if (slug) {
-      query = query.eq('slug', slug);
+      query = query.eq("slug", slug);
     } else {
-      query = query.eq('id', id);
+      query = query.eq("id", id);
     }
 
     const { data: event, error } = await query.single();
 
     if (error || !event) {
-      showErrorState('Evento não encontrado', 'Não encontramos nenhum evento com este link.');
+      showErrorState(
+        "Evento não encontrado",
+        "Não encontramos nenhum evento com este link.",
+      );
       return;
     }
 
-    if (event.status === 'draft' || event.status === 'archived') {
-      showErrorState('Evento Indisponível', 'Este evento não está disponível para confirmação no momento.');
+    if (event.status === "draft" || event.status === "archived") {
+      showErrorState(
+        "Evento Indisponível",
+        "Este evento não está disponível para confirmação no momento.",
+      );
       return;
     }
 
-    const isExpired = event.confirmation_deadline && new Date(event.confirmation_deadline) < new Date();
-    if (event.status === 'closed' || isExpired) {
-      showErrorState('Confirmações Encerradas', 'O prazo para confirmação de presença para este evento foi encerrado.');
+    const isExpired =
+      event.confirmation_deadline &&
+      new Date(event.confirmation_deadline) < new Date();
+    if (event.status === "closed" || isExpired) {
+      showErrorState(
+        "Confirmações Encerradas",
+        "O prazo para confirmação de presença para este evento foi encerrado.",
+      );
       return;
     }
 
@@ -71,10 +85,10 @@ async function loadPublicEvent(slug, id) {
 
     // Carregar campos personalizados
     const { data: fields } = await supabase
-      .from('form_fields')
-      .select('*')
-      .eq('event_id', event.id)
-      .order('position', { ascending: true });
+      .from("form_fields")
+      .select("*")
+      .eq("event_id", event.id)
+      .order("position", { ascending: true });
 
     currentCustomFields = fields || [];
 
@@ -82,22 +96,24 @@ async function loadPublicEvent(slug, id) {
     // permitir que o convidado se identifique digitando o nome, em vez de
     // preencher tudo manualmente do zero.
     const { data: guests } = await supabase
-      .from('guest_list')
-      .select('*')
-      .eq('event_id', event.id);
+      .from("guest_list")
+      .select("*")
+      .eq("event_id", event.id);
 
     guestListForEvent = guests || [];
 
     renderEventPublicView();
-
   } catch (err) {
-    console.error('Erro ao carregar evento público:', err);
-    showErrorState('Erro de Conexão', 'Não foi possível carregar as informações do evento.');
+    console.error("Erro ao carregar evento público:", err);
+    showErrorState(
+      "Erro de Conexão",
+      "Não foi possível carregar as informações do evento.",
+    );
   }
 }
 
 function showErrorState(title, message) {
-  const container = document.getElementById('public-rsvp-container');
+  const container = document.getElementById("public-rsvp-container");
   if (!container) return;
 
   container.innerHTML = `
@@ -116,25 +132,26 @@ function showErrorState(title, message) {
 // organizador não define uma "cover_url" própria. Não dependem de nenhuma imagem
 // externa (sem risco de licença/direitos autorais e sem link que possa quebrar).
 const EVENT_TYPE_COVER_THEMES = {
-  'Casamento': { c1: '#f5d0c5', c2: '#c9184a', emoji: '💍' },
-  'Aniversário': { c1: '#a78bfa', c2: '#ec4899', emoji: '🎉' },
-  'Festa de 15 anos': { c1: '#f9a8d4', c2: '#9333ea', emoji: '👑' },
-  'Formatura': { c1: '#1e3a8a', c2: '#3b82f6', emoji: '🎓' },
-  'Culto': { c1: '#fef3c7', c2: '#b45309', emoji: '🙏' },
-  'Congresso': { c1: '#0f766e', c2: '#0891b2', emoji: '🎤' },
-  'Conferência': { c1: '#312e81', c2: '#4f46e5', emoji: '💼' },
-  'Evento Empresarial': { c1: '#334155', c2: '#0f172a', emoji: '💼' },
-  'Workshop': { c1: '#065f46', c2: '#10b981', emoji: '🛠️' },
-  'Encontro': { c1: '#f97316', c2: '#ea580c', emoji: '🤝' },
-  'Evento Familiar': { c1: '#84cc16', c2: '#16a34a', emoji: '👨‍👩‍👧‍👦' },
-  'Chá de bebê': { c1: '#bae6fd', c2: '#f9a8d4', emoji: '🍼' },
-  'Chá revelação': { c1: '#93c5fd', c2: '#f9a8d4', emoji: '🎀' },
-  'Confraternização': { c1: '#f97316', c2: '#b91c1c', emoji: '🥂' },
-  'Personalizado': { c1: '#4f46e5', c2: '#ec4899', emoji: '🎊' }
+  Casamento: { c1: "#f5d0c5", c2: "#c9184a", emoji: "💍" },
+  Aniversário: { c1: "#a78bfa", c2: "#ec4899", emoji: "🎉" },
+  "Festa de 15 anos": { c1: "#f9a8d4", c2: "#9333ea", emoji: "👑" },
+  Formatura: { c1: "#1e3a8a", c2: "#3b82f6", emoji: "🎓" },
+  Culto: { c1: "#fef3c7", c2: "#b45309", emoji: "🙏" },
+  Congresso: { c1: "#0f766e", c2: "#0891b2", emoji: "🎤" },
+  Conferência: { c1: "#312e81", c2: "#4f46e5", emoji: "💼" },
+  "Evento Empresarial": { c1: "#334155", c2: "#0f172a", emoji: "💼" },
+  Workshop: { c1: "#065f46", c2: "#10b981", emoji: "🛠️" },
+  Encontro: { c1: "#f97316", c2: "#ea580c", emoji: "🤝" },
+  "Evento Familiar": { c1: "#84cc16", c2: "#16a34a", emoji: "👨‍👩‍👧‍👦" },
+  "Chá de bebê": { c1: "#bae6fd", c2: "#f9a8d4", emoji: "🍼" },
+  "Chá revelação": { c1: "#93c5fd", c2: "#f9a8d4", emoji: "🎀" },
+  Confraternização: { c1: "#f97316", c2: "#b91c1c", emoji: "🥂" },
+  Personalizado: { c1: "#4f46e5", c2: "#ec4899", emoji: "🎊" },
 };
 
 function getDefaultEventCover(type) {
-  const theme = EVENT_TYPE_COVER_THEMES[type] || EVENT_TYPE_COVER_THEMES['Personalizado'];
+  const theme =
+    EVENT_TYPE_COVER_THEMES[type] || EVENT_TYPE_COVER_THEMES["Personalizado"];
 
   const svg = `
     <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="500" viewBox="0 0 1200 500">
@@ -158,18 +175,25 @@ function getDefaultEventCover(type) {
 }
 
 function renderEventPublicView() {
-  const container = document.getElementById('public-rsvp-container');
+  const container = document.getElementById("public-rsvp-container");
   if (!container) return;
 
   // Aplicar cores personalizadas
   if (currentEvent.primary_color) {
-    document.documentElement.style.setProperty('--event-primary', currentEvent.primary_color);
+    document.documentElement.style.setProperty(
+      "--event-primary",
+      currentEvent.primary_color,
+    );
   }
   if (currentEvent.secondary_color) {
-    document.documentElement.style.setProperty('--event-secondary', currentEvent.secondary_color);
+    document.documentElement.style.setProperty(
+      "--event-secondary",
+      currentEvent.secondary_color,
+    );
   }
 
-  const coverUrl = currentEvent.cover_url || getDefaultEventCover(currentEvent.type);
+  const coverUrl =
+    currentEvent.cover_url || getDefaultEventCover(currentEvent.type);
   const formattedDate = formatDateBR(currentEvent.event_date);
   const formattedTime = formatTimeBR(currentEvent.event_time);
 
@@ -179,7 +203,7 @@ function renderEventPublicView() {
       <div class="event-cover-banner" style="background-image: url('${coverUrl}');">
         <div class="event-cover-overlay">
           <div>
-            <span class="event-badge-type">${escapeHTML(currentEvent.type || 'Evento Especial')}</span>
+            <span class="event-badge-type">${escapeHTML(currentEvent.type || "Evento Especial")}</span>
           </div>
         </div>
       </div>
@@ -187,7 +211,7 @@ function renderEventPublicView() {
       <!-- Cabeçalho do Evento -->
       <div class="event-header-content">
         <h1 class="event-title-public">${escapeHTML(currentEvent.title)}</h1>
-        ${currentEvent.host_name ? `<p class="event-host-name">Convidado por: <strong>${escapeHTML(currentEvent.host_name)}</strong></p>` : ''}
+        ${currentEvent.host_name ? `<p class="event-host-name">Convidado por: <strong>${escapeHTML(currentEvent.host_name)}</strong></p>` : ""}
       </div>
 
       <!-- Detalhes de Data, Hora e Local -->
@@ -204,7 +228,7 @@ function renderEventPublicView() {
           <div class="event-info-icon"><i class="fas fa-clock"></i></div>
           <div>
             <div class="event-info-label">Horário</div>
-            <div class="event-info-val">${formattedTime || 'A definir'}</div>
+            <div class="event-info-val">${formattedTime || "A definir"}</div>
           </div>
         </div>
 
@@ -213,13 +237,15 @@ function renderEventPublicView() {
           <div style="flex: 1;">
             <div class="event-info-label">Local</div>
             <div class="event-info-val">${escapeHTML(currentEvent.location)}</div>
-            ${currentEvent.address ? `<div class="text-muted" style="font-size: 0.8125rem;">${escapeHTML(currentEvent.address)}</div>` : ''}
+            ${currentEvent.address ? `<div class="text-muted" style="font-size: 0.8125rem;">${escapeHTML(currentEvent.address)}</div>` : ""}
           </div>
         </div>
       </div>
 
       <!-- Contagem Regressiva -->
-      ${currentEvent.countdown_enabled ? `
+      ${
+        currentEvent.countdown_enabled
+          ? `
         <div class="countdown-box">
           <div class="countdown-title"><i class="fas fa-hourglass-half"></i> Contagem Regressiva para o Evento</div>
           <div class="countdown-timer" id="countdown-display">
@@ -229,15 +255,21 @@ function renderEventPublicView() {
             <div class="countdown-unit"><span class="countdown-number" id="cd-secs">00</span><span class="countdown-label">Segundos</span></div>
           </div>
         </div>
-      ` : ''}
+      `
+          : ""
+      }
 
       <!-- Mensagem Inicial -->
-      ${currentEvent.welcome_message ? `
+      ${
+        currentEvent.welcome_message
+          ? `
         <div class="event-welcome-msg">
           <i class="fas fa-quote-left text-muted" style="margin-right: 0.5rem;"></i>
           ${escapeHTML(currentEvent.welcome_message)}
         </div>
-      ` : ''}
+      `
+          : ""
+      }
 
       <!-- Formulario de Confirmação -->
       <form id="public-rsvp-form" style="padding: 1.5rem;" onsubmit="handlePublicSubmit(event)">
@@ -258,13 +290,17 @@ function renderEventPublicView() {
 
         <!-- Seção de Dados Principais -->
         <div id="rsvp-fields-section" style="display: none;">
-          ${currentEvent.require_invitation_code ? `
+          ${
+            currentEvent.require_invitation_code
+              ? `
             <div class="form-group">
               <label class="form-label">Código do Convite <span class="required">*</span></label>
               <input type="text" id="rsvp-invitation-code" class="form-control" placeholder="Ex: AB1234" style="text-transform: uppercase;">
               <small class="form-help">Informe o código impresso no seu convite.</small>
             </div>
-          ` : ''}
+          `
+              : ""
+          }
 
           <div id="guest-search-group">
             ${renderGuestSearchBoxHTML()}
@@ -332,53 +368,59 @@ function renderEventPublicView() {
 }
 
 function renderCustomFieldsHTML() {
-  if (!currentCustomFields.length) return '';
+  if (!currentCustomFields.length) return "";
 
-  return currentCustomFields.map(f => {
-    const fieldId = `custom-field-${f.id}`;
-    const opts = Array.isArray(f.options) ? f.options : [];
+  return currentCustomFields
+    .map((f) => {
+      const fieldId = `custom-field-${f.id}`;
+      const opts = Array.isArray(f.options) ? f.options : [];
 
-    let inputHTML = '';
-    if (f.field_type === 'textarea') {
-      inputHTML = `<textarea id="${fieldId}" class="form-control" rows="3" placeholder="${escapeHTML(f.placeholder || '')}"></textarea>`;
-    } else if (f.field_type === 'select') {
-      inputHTML = `
+      let inputHTML = "";
+      if (f.field_type === "textarea") {
+        inputHTML = `<textarea id="${fieldId}" class="form-control" rows="3" placeholder="${escapeHTML(f.placeholder || "")}"></textarea>`;
+      } else if (f.field_type === "select") {
+        inputHTML = `
         <select id="${fieldId}" class="form-control">
-          <option value="">${escapeHTML(f.placeholder || 'Selecione...')}</option>
-          ${opts.map(o => `<option value="${escapeHTML(o)}">${escapeHTML(o)}</option>`).join('')}
+          <option value="">${escapeHTML(f.placeholder || "Selecione...")}</option>
+          ${opts.map((o) => `<option value="${escapeHTML(o)}">${escapeHTML(o)}</option>`).join("")}
         </select>
       `;
-    } else if (f.field_type === 'radio' || f.field_type === 'checkbox') {
-      inputHTML = `
+      } else if (f.field_type === "radio" || f.field_type === "checkbox") {
+        inputHTML = `
         <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.25rem;">
-          ${opts.map(o => `
+          ${opts
+            .map(
+              (o) => `
             <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; cursor: pointer;">
               <input type="${f.field_type}" name="${fieldId}" value="${escapeHTML(o)}"> ${escapeHTML(o)}
             </label>
-          `).join('')}
+          `,
+            )
+            .join("")}
         </div>
       `;
-    } else {
-      inputHTML = `<input type="${f.field_type}" id="${fieldId}" class="form-control" placeholder="${escapeHTML(f.placeholder || '')}">`;
-    }
+      } else {
+        inputHTML = `<input type="${f.field_type}" id="${fieldId}" class="form-control" placeholder="${escapeHTML(f.placeholder || "")}">`;
+      }
 
-    return `
+      return `
       <div class="form-group" data-custom-field-id="${f.id}">
-        <label class="form-label">${escapeHTML(f.label)} ${f.required ? '<span class="required">*</span>' : ''}</label>
+        <label class="form-label">${escapeHTML(f.label)} ${f.required ? '<span class="required">*</span>' : ""}</label>
         ${inputHTML}
-        ${f.help_text ? `<small class="form-help">${escapeHTML(f.help_text)}</small>` : ''}
+        ${f.help_text ? `<small class="form-help">${escapeHTML(f.help_text)}</small>` : ""}
       </div>
     `;
-  }).join('');
+    })
+    .join("");
 }
 
 // FIX: normaliza texto (remove acentos/caixa) para permitir busca por nome
 // tolerante a diferenças de acentuação e maiúsculas/minúsculas.
 function normalizeSearchText(text) {
-  return (text || '')
+  return (text || "")
     .toString()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
     .trim();
 }
@@ -399,7 +441,7 @@ function renderNameFieldHTML() {
 // Gera o HTML do bloco de busca por nome (ou nada, se o evento não tiver
 // convidados pré-cadastrados em guest_list).
 function renderGuestSearchBoxHTML() {
-  if (!guestListForEvent.length) return '';
+  if (!guestListForEvent.length) return "";
 
   if (selectedGuest) {
     return `
@@ -407,7 +449,7 @@ function renderGuestSearchBoxHTML() {
         <div>
           <i class="fas fa-check-circle" style="color: var(--success); margin-right: 0.5rem;"></i>
           Convidado identificado: <strong>${escapeHTML(selectedGuest.name)}</strong>
-          ${selectedGuest.group_name ? `<div class="text-muted" style="font-size: 0.75rem; margin-top: 0.125rem;">${escapeHTML(selectedGuest.group_name)}</div>` : ''}
+          ${selectedGuest.group_name ? `<div class="text-muted" style="font-size: 0.75rem; margin-top: 0.125rem;">${escapeHTML(selectedGuest.group_name)}</div>` : ""}
         </div>
         <button type="button" class="btn btn-sm btn-secondary" onclick="clearSelectedGuest()">Não sou eu</button>
       </div>
@@ -425,19 +467,19 @@ function renderGuestSearchBoxHTML() {
 }
 
 window.handleGuestSearchInput = function (value) {
-  const resultsBox = document.getElementById('guest-search-results');
+  const resultsBox = document.getElementById("guest-search-results");
   if (!resultsBox) return;
 
   const term = normalizeSearchText(value);
 
   if (!term) {
-    resultsBox.innerHTML = '';
-    resultsBox.style.display = 'none';
+    resultsBox.innerHTML = "";
+    resultsBox.style.display = "none";
     return;
   }
 
   const matches = guestListForEvent
-    .filter(g => normalizeSearchText(g.name).includes(term))
+    .filter((g) => normalizeSearchText(g.name).includes(term))
     .slice(0, 6);
 
   if (!matches.length) {
@@ -446,44 +488,48 @@ window.handleGuestSearchInput = function (value) {
         Nenhum nome encontrado. Verifique a grafia ou entre em contato com o organizador do evento.
       </div>
     `;
-    resultsBox.style.display = 'block';
+    resultsBox.style.display = "block";
     return;
   }
 
-  resultsBox.innerHTML = matches.map(g => `
+  resultsBox.innerHTML = matches
+    .map(
+      (g) => `
     <div onclick="selectGuestFromList('${g.id}')" style="padding: 0.75rem 1rem; cursor: pointer; border-bottom: 1px solid var(--border-color);" onmouseover="this.style.backgroundColor='var(--bg-tertiary)'" onmouseout="this.style.backgroundColor='transparent'">
       <strong>${escapeHTML(g.name)}</strong>
-      ${g.group_name ? `<span class="text-muted" style="font-size: 0.8125rem;"> — ${escapeHTML(g.group_name)}</span>` : ''}
+      ${g.group_name ? `<span class="text-muted" style="font-size: 0.8125rem;"> — ${escapeHTML(g.group_name)}</span>` : ""}
     </div>
-  `).join('');
-  resultsBox.style.display = 'block';
+  `,
+    )
+    .join("");
+  resultsBox.style.display = "block";
 };
 
 window.selectGuestFromList = function (guestId) {
-  const g = guestListForEvent.find(item => item.id === guestId);
+  const g = guestListForEvent.find((item) => item.id === guestId);
   if (!g) return;
 
   selectedGuest = g;
 
-  const searchGroup = document.getElementById('guest-search-group');
+  const searchGroup = document.getElementById("guest-search-group");
   if (searchGroup) searchGroup.innerHTML = renderGuestSearchBoxHTML();
 
   // FIX: campo Nome deixa de ser "disabled" e passa a ser "readonly" — mostra o
   // nome vindo da lista, mas continua impedindo digitação manual.
-  const nameInput = document.getElementById('rsvp-name');
+  const nameInput = document.getElementById("rsvp-name");
   if (nameInput) {
     nameInput.disabled = false;
     nameInput.value = g.name;
     nameInput.readOnly = true;
   }
 
-  const phoneInput = document.getElementById('rsvp-phone');
+  const phoneInput = document.getElementById("rsvp-phone");
   if (phoneInput && g.phone) phoneInput.value = g.phone;
 
-  const emailInput = document.getElementById('rsvp-email');
+  const emailInput = document.getElementById("rsvp-email");
   if (emailInput && g.email) emailInput.value = g.email;
 
-  const codeInput = document.getElementById('rsvp-invitation-code');
+  const codeInput = document.getElementById("rsvp-invitation-code");
   if (codeInput && g.invitation_code) {
     codeInput.value = g.invitation_code;
     codeInput.readOnly = true;
@@ -492,8 +538,8 @@ window.selectGuestFromList = function (guestId) {
   // Recalcula o limite de acompanhantes para o cadastro deste convidado
   adultCount = 1;
   childCount = 0;
-  const adultsEl = document.getElementById('count-adults');
-  const childrenEl = document.getElementById('count-children');
+  const adultsEl = document.getElementById("count-adults");
+  const childrenEl = document.getElementById("count-children");
   if (adultsEl) adultsEl.textContent = adultCount;
   if (childrenEl) childrenEl.textContent = childCount;
 };
@@ -501,67 +547,74 @@ window.selectGuestFromList = function (guestId) {
 window.clearSelectedGuest = function () {
   selectedGuest = null;
 
-  const searchGroup = document.getElementById('guest-search-group');
+  const searchGroup = document.getElementById("guest-search-group");
   if (searchGroup) searchGroup.innerHTML = renderGuestSearchBoxHTML();
 
   // FIX: volta ao estado travado (disabled) — não permite digitar o nome
   // manualmente, só buscar de novo na lista.
-  const nameInput = document.getElementById('rsvp-name');
+  const nameInput = document.getElementById("rsvp-name");
   if (nameInput) {
     nameInput.readOnly = false;
-    nameInput.value = '';
+    nameInput.value = "";
     nameInput.disabled = true;
   }
 
-  const codeInput = document.getElementById('rsvp-invitation-code');
+  const codeInput = document.getElementById("rsvp-invitation-code");
   if (codeInput) codeInput.readOnly = false;
 };
 
 window.selectAttendance = function (status) {
   selectedAttendance = status;
 
-  const cardYes = document.getElementById('card-attend-yes');
-  const cardNo = document.getElementById('card-attend-no');
-  const fieldsSection = document.getElementById('rsvp-fields-section');
-  const companionSection = document.getElementById('companion-section');
+  const cardYes = document.getElementById("card-attend-yes");
+  const cardNo = document.getElementById("card-attend-no");
+  const fieldsSection = document.getElementById("rsvp-fields-section");
+  const companionSection = document.getElementById("companion-section");
 
   if (cardYes && cardNo) {
-    cardYes.className = status === 'confirmed' ? 'attendance-card selected-yes' : 'attendance-card';
-    cardNo.className = status === 'declined' ? 'attendance-card selected-no' : 'attendance-card';
+    cardYes.className =
+      status === "confirmed"
+        ? "attendance-card selected-yes"
+        : "attendance-card";
+    cardNo.className =
+      status === "declined" ? "attendance-card selected-no" : "attendance-card";
   }
 
-  if (fieldsSection) fieldsSection.style.display = 'block';
-  if (companionSection) companionSection.style.display = status === 'confirmed' ? 'block' : 'none';
+  if (fieldsSection) fieldsSection.style.display = "block";
+  if (companionSection)
+    companionSection.style.display = status === "confirmed" ? "block" : "none";
 
   // Smooth scroll
-  fieldsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  fieldsSection.scrollIntoView({ behavior: "smooth", block: "nearest" });
 };
 
 window.changeCount = function (type, delta) {
   // FIX: se o convidado foi identificado na lista prévia, respeita o limite de
   // acompanhantes definido especificamente para ele; senão usa o limite geral do evento.
-  const maxPerInvite = (selectedGuest && typeof selectedGuest.max_companions === 'number')
-    ? selectedGuest.max_companions
-    : (currentEvent.max_guests_per_invite || 4);
+  const maxPerInvite =
+    selectedGuest && typeof selectedGuest.max_companions === "number"
+      ? selectedGuest.max_companions
+      : currentEvent.max_guests_per_invite || 4;
 
-  if (type === 'adults') {
+  if (type === "adults") {
     adultCount = Math.max(1, Math.min(maxPerInvite, adultCount + delta));
-    document.getElementById('count-adults').textContent = adultCount;
-  } else if (type === 'children') {
+    document.getElementById("count-adults").textContent = adultCount;
+  } else if (type === "children") {
     childCount = Math.max(0, Math.min(maxPerInvite, childCount + delta));
-    document.getElementById('count-children').textContent = childCount;
+    document.getElementById("count-children").textContent = childCount;
   }
 };
 
 function startCountdownTimer(dateStr, timeStr) {
-  const targetDate = new Date(`${dateStr}T${timeStr || '00:00:00'}`).getTime();
+  const targetDate = new Date(`${dateStr}T${timeStr || "00:00:00"}`).getTime();
 
   function updateTimer() {
     const now = new Date().getTime();
     const diff = targetDate - now;
 
     if (diff <= 0) {
-      document.getElementById('countdown-display').innerHTML = '<div style="font-weight: 700;">É hoje! O evento começou.</div>';
+      document.getElementById("countdown-display").innerHTML =
+        '<div style="font-weight: 700;">É hoje! O evento começou.</div>';
       return;
     }
 
@@ -570,15 +623,15 @@ function startCountdownTimer(dateStr, timeStr) {
     const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
     const secs = Math.floor((diff % (1000 * 60)) / 1000);
 
-    const daysEl = document.getElementById('cd-days');
-    const hoursEl = document.getElementById('cd-hours');
-    const minsEl = document.getElementById('cd-mins');
-    const secsEl = document.getElementById('cd-secs');
+    const daysEl = document.getElementById("cd-days");
+    const hoursEl = document.getElementById("cd-hours");
+    const minsEl = document.getElementById("cd-mins");
+    const secsEl = document.getElementById("cd-secs");
 
-    if (daysEl) daysEl.textContent = String(days).padStart(2, '0');
-    if (hoursEl) hoursEl.textContent = String(hours).padStart(2, '0');
-    if (minsEl) minsEl.textContent = String(mins).padStart(2, '0');
-    if (secsEl) secsEl.textContent = String(secs).padStart(2, '0');
+    if (daysEl) daysEl.textContent = String(days).padStart(2, "0");
+    if (hoursEl) hoursEl.textContent = String(hours).padStart(2, "0");
+    if (minsEl) minsEl.textContent = String(mins).padStart(2, "0");
+    if (secsEl) secsEl.textContent = String(secs).padStart(2, "0");
   }
 
   updateTimer();
@@ -589,72 +642,92 @@ window.handlePublicSubmit = async function (e) {
   e.preventDefault();
 
   if (!selectedAttendance) {
-    window.showToast('Selecione se irá comparecer ou não.', 'warning');
+    window.showToast("Selecione se irá comparecer ou não.", "warning");
     return;
   }
 
   // FIX: se o evento tem lista de convidados, é obrigatório ter identificado o
   // convidado pela busca — não é permitido confirmar com nome digitado manualmente.
   if (guestListForEvent.length > 0 && !selectedGuest) {
-    window.showToast('Busque e selecione seu nome na lista de convidados para continuar.', 'warning');
+    window.showToast(
+      "Busque e selecione seu nome na lista de convidados para continuar.",
+      "warning",
+    );
     return;
   }
 
-  const name = document.getElementById('rsvp-name').value.trim();
-  const phone = document.getElementById('rsvp-phone').value.trim();
-  const email = document.getElementById('rsvp-email')?.value.trim() || null;
+  const name = document.getElementById("rsvp-name").value.trim();
+  const phone = document.getElementById("rsvp-phone").value.trim();
+  const email = document.getElementById("rsvp-email")?.value.trim() || null;
   // FIX: se o convidado foi identificado na lista prévia, usa o código de convite
   // dele automaticamente (mesmo que o campo esteja oculto/travado); senão, usa o
   // que foi digitado manualmente.
   const invitation_code = selectedGuest
     ? selectedGuest.invitation_code
-    : (document.getElementById('rsvp-invitation-code')?.value.trim() || null);
+    : document.getElementById("rsvp-invitation-code")?.value.trim() || null;
 
   if (!name || !phone) {
-    window.showToast('Por favor, informe seu Nome e Telefone.', 'warning');
+    window.showToast("Por favor, informe seu Nome e Telefone.", "warning");
     return;
   }
 
-  const submitBtn = document.getElementById('submit-rsvp-btn');
+  const submitBtn = document.getElementById("submit-rsvp-btn");
   submitBtn.disabled = true;
   submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
 
   try {
     const supabase = window.supabaseClient;
 
-    // Inserir registro de confirmação
+    // Inserir registro de confirmação.
+    // IMPORTANTE: total_people é calculado no banco e não deve ser enviado em INSERT;
+    // também enviamos created_at/updated_at explicitamente para deixar o registro compatível
+    // com versões antigas do schema do projeto e com o Trigger de auditoria.
     const confPayload = {
       event_id: currentEvent.id,
-      // FIX: guest_id vincula a confirmação ao registro da lista de convidados,
-      // quando o convidado foi identificado pela busca.
       guest_id: selectedGuest ? selectedGuest.id : null,
       name,
       phone,
       email,
       invitation_code,
       attendance_status: selectedAttendance,
-      adults: selectedAttendance === 'confirmed' ? adultCount : 0,
-      children: selectedAttendance === 'confirmed' ? childCount : 0,
-      companions: 0
-      // FIX: total_people é coluna GENERATED ALWAYS (adults + children + companions)
-      // no Postgres — não pode ser enviada no insert, o banco calcula sozinho.
-      // Era isso que fazia todo envio de confirmação falhar.
+      adults:
+        selectedAttendance === "confirmed"
+          ? Math.max(1, Number(adultCount) || 1)
+          : 0,
+      children:
+        selectedAttendance === "confirmed"
+          ? Math.max(0, Number(childCount) || 0)
+          : 0,
+      companions: 0,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
     };
 
-    const { data: conf, error: confErr } = await supabase.from('confirmations').insert([confPayload]).select().single();
+    const { data: conf, error: confErr } = await supabase
+      .from("confirmations")
+      .insert([confPayload])
+      .select()
+      .single();
+
     if (confErr) throw confErr;
 
     // Coletar e inserir respostas personalizadas
     if (currentCustomFields.length > 0 && conf) {
       const answersToInsert = [];
 
-      currentCustomFields.forEach(f => {
-        const fieldId = `custom-field-${f.id}`;
-        let ansVal = '';
+      currentCustomFields.forEach((f) => {
+        if (!f || !f.id) return;
 
-        if (f.field_type === 'radio' || f.field_type === 'checkbox') {
-          const checked = document.querySelectorAll(`input[name="${fieldId}"]:checked`);
-          ansVal = Array.from(checked).map(c => c.value).join(', ');
+        const fieldId = `custom-field-${f.id}`;
+        let ansVal = "";
+
+        if (f.field_type === "radio" || f.field_type === "checkbox") {
+          const checked = document.querySelectorAll(
+            `input[name="${fieldId}"]:checked`,
+          );
+          ansVal = Array.from(checked)
+            .map((c) => c.value)
+            .join(", ");
         } else {
           const el = document.getElementById(fieldId);
           if (el) ansVal = el.value.trim();
@@ -665,13 +738,16 @@ window.handlePublicSubmit = async function (e) {
             confirmation_id: conf.id,
             field_id: f.id,
             field_label: f.label,
-            answer: ansVal
+            answer: ansVal,
           });
         }
       });
 
       if (answersToInsert.length > 0) {
-        await supabase.from('confirmation_answers').insert(answersToInsert);
+        const { error: answersErr } = await supabase
+          .from("confirmation_answers")
+          .insert(answersToInsert);
+        if (answersErr) throw answersErr;
       }
     }
 
@@ -680,41 +756,51 @@ window.handlePublicSubmit = async function (e) {
     // principal caso essa atualização falhe).
     if (selectedGuest) {
       try {
-        await supabase.from('guest_list').update({ status: selectedAttendance }).eq('id', selectedGuest.id);
+        await supabase
+          .from("guest_list")
+          .update({ status: selectedAttendance })
+          .eq("id", selectedGuest.id);
       } catch (guestUpdateErr) {
-        console.error('Erro ao atualizar status na lista de convidados:', guestUpdateErr);
+        console.error(
+          "Erro ao atualizar status na lista de convidados:",
+          guestUpdateErr,
+        );
       }
     }
 
     // Tela final de sucesso ou recusa
     renderConfirmationSuccessScreen();
-
   } catch (err) {
-    console.error('Erro ao enviar confirmação:', err);
-    window.showToast('Não foi possível registrar sua resposta. Tente novamente.', 'error');
+    console.error("Erro ao enviar confirmação:", err);
+    window.showToast(
+      "Não foi possível registrar sua resposta. Tente novamente.",
+      "error",
+    );
     submitBtn.disabled = false;
-    submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Confirmar Resposta';
+    submitBtn.innerHTML =
+      '<i class="fas fa-paper-plane"></i> Confirmar Resposta';
   }
 };
 
 function renderConfirmationSuccessScreen() {
-  const container = document.getElementById('public-rsvp-container');
+  const container = document.getElementById("public-rsvp-container");
   if (!container) return;
 
-  const isConfirmed = selectedAttendance === 'confirmed';
-  const messageText = isConfirmed ?
-    (currentEvent.confirmation_message || 'Presença confirmada com sucesso!') :
-    (currentEvent.rejection_message || 'Sua resposta foi salva. Obrigado por nos avisar!');
+  const isConfirmed = selectedAttendance === "confirmed";
+  const messageText = isConfirmed
+    ? currentEvent.confirmation_message || "Presença confirmada com sucesso!"
+    : currentEvent.rejection_message ||
+      "Sua resposta foi salva. Obrigado por nos avisar!";
 
   container.innerHTML = `
     <div class="event-card-public">
       <div class="success-screen">
-        <div class="animated-checkmark" style="${!isConfirmed ? 'background-color: var(--danger-bg); color: var(--danger); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0.15);' : ''}">
-          <i class="${isConfirmed ? 'fas fa-check' : 'fas fa-heart-broken'}"></i>
+        <div class="animated-checkmark" style="${!isConfirmed ? "background-color: var(--danger-bg); color: var(--danger); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0.15);" : ""}">
+          <i class="${isConfirmed ? "fas fa-check" : "fas fa-heart-broken"}"></i>
         </div>
 
         <h2 style="font-size: 1.75rem; font-weight: 800;">
-          ${isConfirmed ? 'Presença Confirmada!' : 'Resposta Registrada'}
+          ${isConfirmed ? "Presença Confirmada!" : "Resposta Registrada"}
         </h2>
 
         <p class="text-secondary" style="font-size: 1.05rem; max-width: 440px; line-height: 1.6;">
@@ -724,7 +810,7 @@ function renderConfirmationSuccessScreen() {
         <div style="margin-top: 1rem; padding: 1rem 1.5rem; background-color: var(--bg-tertiary); border-radius: 12px; width: 100%;">
           <div style="font-weight: 700; font-size: 1.125rem;">${escapeHTML(currentEvent.title)}</div>
           <div class="text-muted" style="font-size: 0.875rem; margin-top: 0.25rem;">
-            ${formatDateBR(currentEvent.event_date)} às ${formatTimeBR(currentEvent.event_time) || 'Horário a definir'}
+            ${formatDateBR(currentEvent.event_date)} às ${formatTimeBR(currentEvent.event_time) || "Horário a definir"}
           </div>
           <div class="text-muted" style="font-size: 0.875rem;">${escapeHTML(currentEvent.location)}</div>
         </div>
